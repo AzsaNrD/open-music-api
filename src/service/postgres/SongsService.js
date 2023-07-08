@@ -102,6 +102,19 @@ class SongsService {
       throw new NotFoundError('Gagal menghapus lagu. Id tidak ditemukan');
     }
   }
+
+  async getMultipleSongsById(id) {
+    const query = {
+      text: 'SELECT songs.id, songs.title, songs.performer FROM songs JOIN albums ON albums.id = songs."albumId" WHERE songs."albumId" = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Lagu tidak ditemukan');
+    }
+  }
 }
 
 module.exports = SongsService;

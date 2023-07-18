@@ -103,15 +103,36 @@ class SongsService {
     }
   }
 
-  async getMultipleSongsByAlbumId(id) {
+  async getMultipleSongByAlbumId(id) {
     const query = {
-      text: 'SELECT songs.id, songs.title, songs.performer FROM songs JOIN albums ON albums.id = songs."albumId" WHERE songs."albumId" = $1',
+      text: `
+        SELECT songs.id, songs.title, songs.performer
+        FROM songs
+        JOIN albums ON albums.id = songs."albumId"
+        WHERE songs."albumId" = $1
+      `,
       values: [id],
     };
 
     const result = await this._pool.query(query);
 
     return result.rows.map(mapSongsDBToModel);
+  }
+
+  async getMultipleSongByPlaylistId(id) {
+    const query = {
+      text: `
+        SELECT s.id, s.title, s.performer
+        FROM playlist_songs AS ps
+        JOIN songs AS s ON s.id = ps.song_id
+        WHERE ps.playlist_id = $1;
+      `,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result.rows;
   }
 }
 

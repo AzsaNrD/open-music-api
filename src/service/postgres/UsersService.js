@@ -3,6 +3,7 @@ const { nanoid } = require('nanoid');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exception/InvariantError');
 const AuthenticationError = require('../../exception/AuthenticationError');
+const NotFoundError = require('../../exception/NotFoundError');
 
 class UsersService {
   constructor() {
@@ -62,6 +63,20 @@ class UsersService {
     }
 
     return id;
+  }
+
+  async verifyUserExist(id) {
+    console.log('verifyUserExist');
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Id pengguna tidak ditemukan');
+    }
   }
 }
 

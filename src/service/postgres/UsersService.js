@@ -66,7 +66,6 @@ class UsersService {
   }
 
   async verifyUserExist(id) {
-    console.log('verifyUserExist');
     const query = {
       text: 'SELECT id FROM users WHERE id = $1',
       values: [id],

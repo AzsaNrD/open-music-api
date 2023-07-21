@@ -17,13 +17,13 @@ class PlaylistsService {
       text: 'INSERT INTO playlists VALUES($1, $2, $3) RETURNING id',
       values: [id, name, owner],
     };
-    const result = await this._pool.query(query);
+    const { rows, rowCount } = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!rowCount) {
       throw new InvariantError('Playlist gagal ditambahkan');
     }
 
-    return result.rows[0].id;
+    return rows[0].id;
   }
 
   async getPlaylists(owner) {
@@ -37,9 +37,9 @@ class PlaylistsService {
       `,
       values: [owner],
     };
-    const result = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
-    return result.rows;
+    return rows;
   }
 
   async deletePlaylist(playlistId, owner) {
@@ -48,9 +48,9 @@ class PlaylistsService {
       values: [playlistId, owner],
     };
 
-    const result = await this._pool.query(query);
+    const { rowCount } = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!rowCount) {
       throw new NotFoundError('Gagal menghapus playlists. Id tidak ditemukan');
     }
   }
@@ -97,9 +97,9 @@ class PlaylistsService {
       values: [playlistId, songId],
     };
 
-    const result = await this._pool.query(query);
+    const { rowCount } = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!rowCount) {
       throw new InvariantError('Gagal menghapus lagu dalam playlist. Id tidak ditemukan');
     }
 
@@ -134,13 +134,13 @@ class PlaylistsService {
       values: [playlistId],
     };
 
-    const result = await this._pool.query(query);
+    const { rows, rowCount } = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!rowCount) {
       throw new InvariantError('Gagal mendapatkan aktivitas playlist. Id tidak ditemukan');
     }
 
-    return result.rows;
+    return rows;
   }
 
   async verifyPlaylistOwner(id, owner) {
@@ -149,13 +149,13 @@ class PlaylistsService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const { rows, rowCount } = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
-    const playlist = result.rows[0];
+    const playlist = rows[0];
 
     if (playlist.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
@@ -168,9 +168,9 @@ class PlaylistsService {
       values: [songId],
     };
 
-    const result = await this._pool.query(query);
+    const { rowCount } = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!rowCount) {
       throw new NotFoundError('Gagal menambahkan lagu ke playlist. Lagu tidak ditemukan');
     }
   }

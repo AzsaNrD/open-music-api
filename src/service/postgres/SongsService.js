@@ -10,7 +10,7 @@ class SongsService {
   }
 
   async addSong({
-    title, year, performer, genre, duration, albumId,
+    title, year, performer, genre, duration = null, albumId = null,
   }) {
     const id = `song-${nanoid(16)}`;
 

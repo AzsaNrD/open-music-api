@@ -26,6 +26,19 @@ class AlbumsService {
     return rows[0].id;
   }
 
+  async addCoverUrlByAlbumId(id, url) {
+    const query = {
+      text: 'UPDATE albums SET "coverUrl" = $1 WHERE id = $2 RETURNING id',
+      values: [url, id],
+    };
+
+    const { rows } = await this._pool.query(query);
+
+    if (!rows[0].id) {
+      throw new InvariantError('Gagal menambahkan coverUrl. Id album tidak ditemukan');
+    }
+  }
+
   async getAlbumById(id) {
     const query = {
       text: 'SELECT * FROM albums WHERE id = $1',

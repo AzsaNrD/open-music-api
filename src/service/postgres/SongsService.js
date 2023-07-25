@@ -1,6 +1,5 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
-const { mapSongsDBToModel } = require('../../utils/dataMapper');
 const InvariantError = require('../../exception/InvariantError');
 const NotFoundError = require('../../exception/NotFoundError');
 
@@ -33,26 +32,26 @@ class SongsService {
 
     if (title && performer) {
       query = {
-        text: 'SELECT * FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+        text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
         values: [`%${title}%`, `%${performer}%`],
       };
     } else if (title) {
       query = {
-        text: 'SELECT * FROM songs WHERE title ILIKE $1',
+        text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1',
         values: [`%${title}%`],
       };
     } else if (performer) {
       query = {
-        text: 'SELECT * FROM songs WHERE performer ILIKE $1',
+        text: 'SELECT id, title, performer FROM songs WHERE performer ILIKE $1',
         values: [`%${performer}%`],
       };
     } else {
-      query = 'SELECT * FROM songs';
+      query = 'SELECT id, title, performer FROM songs';
     }
 
     const { rows } = await this._pool.query(query);
 
-    return rows.map(mapSongsDBToModel);
+    return rows;
   }
 
   async getSongById(id) {
@@ -75,8 +74,8 @@ class SongsService {
     year,
     genre,
     performer,
-    duration,
-    albumId,
+    duration = null,
+    albumId = null,
   }) {
     const query = {
       text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, "albumId" = $6 WHERE id = $7 RETURNING id',
@@ -116,7 +115,7 @@ class SongsService {
 
     const { rows } = await this._pool.query(query);
 
-    return rows.map(mapSongsDBToModel);
+    return rows;
   }
 
   async getMultipleSongByPlaylistId(id) {
